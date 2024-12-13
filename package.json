@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/react-leaflet": "^3.0.0",
     "geolib": "^3.3.4",
     "leaflet": "^1.9.4",
     "next": "15.1.0",

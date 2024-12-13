@@ -13,7 +13,7 @@ export default function JoggingTracker() {
   const [tracking, setTracking] = useState(false);
 
   useEffect(() => {
-    let timer: NodeJS.Timer | null = null;
+    let timer: ReturnType<typeof setInterval> | null = null;
 
     if (tracking) {
       setStartTime(Date.now());
