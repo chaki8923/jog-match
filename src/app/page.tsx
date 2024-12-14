@@ -8,11 +8,11 @@ const TrackerMap = () => {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
   const [tracking, setTracking] = useState(false);
-  const [position, setPosition] = useState<[number, number] | null>(null);
+  // const [position, setPosition] = useState<[number, number] | null>(null);
   const [lastPosition, setLastPosition] = useState<[number, number] | null>(null); // 前回の位置
   const [distance, setDistance] = useState(0); // 移動距離
   const [elapsedTime, setElapsedTime] = useState(0); // 経過時間
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   // 地球の半径（km）
   const EARTH_RADIUS = 6371;
 
@@ -61,7 +61,7 @@ const TrackerMap = () => {
         watchId = navigator.geolocation.watchPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
-            setPosition([latitude, longitude]); // 現在位置を更新
+            // setPosition([latitude, longitude]); // 現在位置を更新
 
             // 前回位置が存在する場合、移動距離を計算
             if (lastPosition) {
@@ -79,22 +79,22 @@ const TrackerMap = () => {
           (err) => {
             switch (err.code) {
               case err.PERMISSION_DENIED:
-                setError('位置情報の利用が拒否されました。ブラウザ設定をご確認ください。');
+                alert('位置情報の利用が拒否されました。ブラウザ設定をご確認ください。');
                 break;
               case err.POSITION_UNAVAILABLE:
-                setError('位置情報が取得できません。');
+                alert('位置情報が取得できません。');
                 break;
               case err.TIMEOUT:
-                setError('位置情報の取得がタイムアウトしました。');
+                alert('位置情報の取得がタイムアウトしました。');
                 break;
               default:
-                setError('位置情報の取得に失敗しました。');
+                alert('位置情報の取得に失敗しました。');
             }
           },
           { enableHighAccuracy: true }
         );
       } else {
-        setError('このブラウザでは位置情報がサポートされていません。');
+        alert('このブラウザでは位置情報がサポートされていません。');
       }
     }
 
@@ -120,7 +120,7 @@ const TrackerMap = () => {
           (pos) => {
             const { latitude, longitude } = pos.coords;
             const newPos: [number, number] = [latitude, longitude];
-            setPosition(newPos);
+            // setPosition(newPos);
 
             // 地図とマーカーの位置を更新
             if (mapRef.current) mapRef.current.setView(newPos, 15);
