@@ -32,6 +32,7 @@ const TrackerMap = () => {
 
 
   useEffect(() => {
+    if (typeof window === 'undefined') return; 
     let watchId: number | null = null;
     let timer: ReturnType<typeof setInterval> | null = null;
 
