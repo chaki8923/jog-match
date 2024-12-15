@@ -86,9 +86,7 @@ const TrackerMap = () => {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-    } else {
-      alert("スターちょ");
-      
+    } else {      
       setTracking(true);
       setDistance(0);
       setElapsedTime(0);
