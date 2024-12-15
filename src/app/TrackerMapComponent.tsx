@@ -94,8 +94,9 @@ const TrackerMap = () => {
 
       const startTime = Date.now();
       timerRef.current = setInterval(() => {
-        alert(`セット時間${elapsedTime}`)
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+        const newTime = setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+        alert(`セット時間${newTime}`)
+        return newTime;
       }, 1000);
 
       if (navigator.geolocation) {
