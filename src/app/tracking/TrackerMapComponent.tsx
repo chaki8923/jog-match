@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { Map, Marker } from 'leaflet'; // Leaflet の型をインポート
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import Image from 'next/image'
+import styles from './index.module.scss';
 
 const TrackerMap = () => {
   const mapRef = useRef<Map | null>(null);
@@ -86,7 +88,7 @@ const TrackerMap = () => {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-    } else {      
+    } else {
       setTracking(true);
       setDistance(0);
       setElapsedTime(0);
@@ -106,7 +108,7 @@ const TrackerMap = () => {
           (pos) => {
             const { latitude, longitude } = pos.coords;
             const newPos: [number, number] = [latitude, longitude];
-            
+
             if (lastPosition) {
               const delta = calculateDistance(
                 lastPosition[0],
@@ -137,22 +139,31 @@ const TrackerMap = () => {
 
   return (
     <div>
-      <div style={{ padding: '10px' }}>
-        <p>移動距離: {distance.toFixed(2)} km</p>
-        <p>経過時間: {Math.floor(elapsedTime / 60)}分 {elapsedTime % 60}秒</p>
-        <button
-          onClick={handleStartStop}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: tracking ? 'red' : 'green',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
-        >
-          {tracking ? '停止' : '開始'}
-        </button>
+      <div className={styles.flex}>
+
+        <div style={{ padding: '10px' }}>
+          <p>移動距離: {distance.toFixed(2)} km</p>
+          <p>経過時間: {Math.floor(elapsedTime / 60)}分 {elapsedTime % 60}秒</p>
+          <button
+            onClick={handleStartStop}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: tracking ? 'red' : 'green',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            {tracking ? '停止' : '開始'}
+          </button>
+        </div>
+        <Image
+      src="/jog_match.webp"
+      width={500}
+      height={500}
+      alt="Picture of the author"
+    />
       </div>
       <div id="map" style={{ height: '90vh', width: '100%' }}></div>
     </div>
