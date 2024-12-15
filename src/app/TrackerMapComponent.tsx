@@ -94,18 +94,15 @@ const TrackerMap = () => {
 
       const startTime = Date.now();
       timerRef.current = setInterval(() => {
-        alert(`今の時間${Date.now()}`)
-        alert(`スタート時間${startTime}`)
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 1000);
-
+      
+      alert(`セット時間${elapsedTime % 60}`)
       if (navigator.geolocation) {
         const watchId = navigator.geolocation.watchPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
             const newPos: [number, number] = [latitude, longitude];
-            console.log("lastPosition",lastPosition);
-            console.log("newPos",newPos);
             
             if (lastPosition) {
               const delta = calculateDistance(
