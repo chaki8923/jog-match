@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import type { Map, Marker } from 'leaflet'; // Leaflet の型をインポート
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 const TrackerMap = () => {
-  const mapRef = useRef<any>(null);
-  const markerRef = useRef<any>(null);
+  const mapRef = useRef<Map | null>(null);
+  const markerRef = useRef<Marker | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null); // タイマーを useRef で管理
   const [tracking, setTracking] = useState(false);
   const [lastPosition, setLastPosition] = useState<[number, number] | null>(null);
@@ -14,7 +15,6 @@ const TrackerMap = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const EARTH_RADIUS = 6371;
 
-  // 移動距離を計算する
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const toRad = (value: number) => (value * Math.PI) / 180;
     const dLat = toRad(lat2 - lat1);
@@ -28,15 +28,13 @@ const TrackerMap = () => {
 
   useEffect(() => {
     let L: typeof import('leaflet'); // Leaflet の型宣言
-    let watchId: number | null = null;
 
     if (typeof window !== 'undefined') {
       import('leaflet').then((leaflet) => {
         L = leaflet;
 
-        // Leafletマップの初期化
         if (!mapRef.current) {
-          mapRef.current = L.map('map').setView([35.6895, 139.6917], 15); // 初期値: 東京
+          mapRef.current = L.map('map').setView([35.6895, 139.6917], 15);
 
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -49,20 +47,15 @@ const TrackerMap = () => {
           });
         }
 
-        // 現在地の取得と初期設定
+        // 現在地の取得
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (pos) => {
               const { latitude, longitude } = pos.coords;
               const initialPosition: [number, number] = [latitude, longitude];
-              setLastPosition(initialPosition); // 初期位置を保存
+              setLastPosition(initialPosition);
 
-              // 地図を現在地に移動
-              if (mapRef.current) {
-                mapRef.current.setView(initialPosition, 15);
-              }
-
-              // マーカーを現在地に設定
+              if (mapRef.current) mapRef.current.setView(initialPosition, 15);
               if (markerRef.current) {
                 markerRef.current.setLatLng(initialPosition);
               } else {
@@ -81,36 +74,31 @@ const TrackerMap = () => {
       });
     }
 
-    // Cleanup関数
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      if (watchId) navigator.geolocation.clearWatch(watchId);
     };
   }, []);
 
-  // トラッキングの開始・停止
   const handleStartStop = () => {
     if (tracking) {
-      // 停止処理
       setTracking(false);
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
     } else {
-      // 開始処理
       setTracking(true);
-      setDistance(0); // 距離リセット
-      setElapsedTime(0); // 時間リセット
-      setLastPosition(null); // 前回位置リセット
+      setDistance(0);
+      setElapsedTime(0);
+      setLastPosition(null);
 
       const startTime = Date.now();
       timerRef.current = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000)); // 経過時間を更新
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 1000);
 
       if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
+        const watchId = navigator.geolocation.watchPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
             const newPos: [number, number] = [latitude, longitude];
@@ -127,7 +115,6 @@ const TrackerMap = () => {
 
             setLastPosition(newPos);
 
-            // 地図とマーカーを更新
             if (mapRef.current) mapRef.current.setView(newPos, 15);
             if (markerRef.current) {
               markerRef.current.setLatLng(newPos);
@@ -138,6 +125,8 @@ const TrackerMap = () => {
           (err) => console.error('位置情報取得エラー:', err),
           { enableHighAccuracy: true }
         );
+
+        return () => navigator.geolocation.clearWatch(watchId);
       }
     }
   };
