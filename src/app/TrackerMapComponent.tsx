@@ -1,17 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import type { Map, Marker } from 'leaflet';
+import type { Map, Marker } from 'leaflet'; // Leaflet の型をインポート
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 const TrackerMap = () => {
   const mapRef = useRef<Map | null>(null);
   const markerRef = useRef<Marker | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const watchIdRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number | null>(null); // 開始時間を追跡するref
-
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null); // タイマーを useRef で管理
   const [tracking, setTracking] = useState(false);
   const [lastPosition, setLastPosition] = useState<[number, number] | null>(null);
   const [distance, setDistance] = useState(0);
@@ -29,154 +26,111 @@ const TrackerMap = () => {
     return EARTH_RADIUS * c;
   };
 
-  // タイマー管理用の関数
-  const startTimer = () => {
-    // 既存のタイマーがあれば停止
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-
-    // 開始時間を記録
-    startTimeRef.current = Date.now();
-
-    // 新しいタイマー開始
-    timerRef.current = setInterval(() => {
-      if (startTimeRef.current) {
-        const currentTime = Date.now();
-        const elapsed = Math.floor((currentTime - startTimeRef.current) / 1000);
-        setElapsedTime(elapsed);
-      }
-    }, 1000);
-  };
-
-  const stopTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    startTimeRef.current = null;
-  };
-
   useEffect(() => {
-    // 初期マップ設定
+    let L: typeof import('leaflet'); // Leaflet の型宣言
+
     if (typeof window !== 'undefined') {
-      if (!mapRef.current) {
-        mapRef.current = L.map('map').setView([35.6895, 139.6917], 15);
+      import('leaflet').then((leaflet) => {
+        L = leaflet;
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(mapRef.current);
+        if (!mapRef.current) {
+          mapRef.current = L.map('map').setView([35.6895, 139.6917], 15);
 
-        L.Icon.Default.mergeOptions({
-          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-        });
-      }
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+          }).addTo(mapRef.current);
+
+          L.Icon.Default.mergeOptions({
+            iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          });
+        }
+
+        // 現在地の取得
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const { latitude, longitude } = pos.coords;
+              const initialPosition: [number, number] = [latitude, longitude];
+              // setLastPosition(initialPosition);
+
+              if (mapRef.current) mapRef.current.setView(initialPosition, 15);
+              if (markerRef.current) {
+                markerRef.current.setLatLng(initialPosition);
+              } else {
+                markerRef.current = L.marker(initialPosition).addTo(mapRef.current!);
+              }
+            },
+            (err) => {
+              console.error('現在地の取得に失敗しました:', err);
+              alert('現在地の取得に失敗しました。デフォルト位置を使用します。');
+            },
+            { enableHighAccuracy: true }
+          );
+        } else {
+          alert('このブラウザでは位置情報がサポートされていません。');
+        }
+      });
     }
 
-    // コンポーネントのクリーンアップ
     return () => {
-      stopTimer();
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-      }
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
 
   const handleStartStop = () => {
     if (tracking) {
-      // 追跡停止
       setTracking(false);
-      stopTimer();
-
-      // 位置情報の追跡を停止
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
       }
-    } else {
-      // 追跡開始
+    } else {      
       setTracking(true);
       setDistance(0);
       setElapsedTime(0);
       setLastPosition(null);
 
-      // タイマー開始
-      startTimer();
+      const startTime = Date.now();
+      timerRef.current = setInterval(() => {
+        alert(`今の時間${Date.now()}`)
+        alert(`スタート時間${startTime}`)
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
 
-      // 位置情報追跡
       if (navigator.geolocation) {
-        // 最初の位置を取得
-        navigator.geolocation.getCurrentPosition(
-          (initialPos) => {
-            const { latitude, longitude } = initialPos.coords;
-            const initialPosition: [number, number] = [latitude, longitude];
-
-            // マップ初期位置設定
-            if (mapRef.current) {
-              mapRef.current.setView(initialPosition, 15);
+        const watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            const newPos: [number, number] = [latitude, longitude];
+            console.log("lastPosition",lastPosition);
+            console.log("newPos",newPos);
+            
+            if (lastPosition) {
+              const delta = calculateDistance(
+                lastPosition[0],
+                lastPosition[1],
+                latitude,
+                longitude
+              );
+              setDistance((prev) => prev + delta);
             }
 
-            // マーカー設定
+            setLastPosition(newPos);
+
+            if (mapRef.current) mapRef.current.setView(newPos, 15);
             if (markerRef.current) {
-              markerRef.current.setLatLng(initialPosition);
+              markerRef.current.setLatLng(newPos);
             } else {
-              markerRef.current = L.marker(initialPosition).addTo(mapRef.current!);
+              markerRef.current = L.marker(newPos).addTo(mapRef.current!);
             }
-
-            // 継続的な位置追跡
-            watchIdRef.current = navigator.geolocation.watchPosition(
-              (pos) => {
-                const { latitude, longitude } = pos.coords;
-                const newPos: [number, number] = [latitude, longitude];
-                
-                // 最初の位置または前回の位置との距離計算
-                if (lastPosition) {
-                  const delta = calculateDistance(
-                    lastPosition[0],
-                    lastPosition[1],
-                    latitude,
-                    longitude
-                  );
-                  setDistance((prev) => prev + delta);
-                }
-
-                // 位置更新
-                setLastPosition(newPos);
-
-                // マップとマーカーの更新
-                if (mapRef.current) mapRef.current.setView(newPos, 15);
-                if (markerRef.current) {
-                  markerRef.current.setLatLng(newPos);
-                }
-              },
-              (err) => {
-                console.error('位置情報取得エラー:', err);
-                alert('位置情報の取得に失敗しました');
-                setTracking(false);
-              },
-              { 
-                enableHighAccuracy: true,
-                maximumAge: 0,
-                timeout: 10000 // タイムアウトを延長
-              }
-            );
           },
-          (err) => {
-            console.error('初期位置取得エラー:', err);
-            alert('初期位置の取得に失敗しました');
-            setTracking(false);
-          },
-          { 
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 10000 
-          }
+          (err) => console.error('位置情報取得エラー:', err),
+          { enableHighAccuracy: true }
         );
-      } else {
-        alert('位置情報が利用できません');
-        setTracking(false);
+
+        return () => navigator.geolocation.clearWatch(watchId);
       }
     }
   };
