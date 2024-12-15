@@ -94,7 +94,7 @@ const TrackerMap = () => {
 
       const startTime = Date.now();
       timerRef.current = setInterval(() => {
-        alert(`セット時間${Math.floor((Date.now() - startTime) / 1000)}`)
+        alert(`セット時間${elapsedTime}`)
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 1000);
 
