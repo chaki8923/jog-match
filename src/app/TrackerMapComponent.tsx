@@ -94,10 +94,10 @@ const TrackerMap = () => {
 
       const startTime = Date.now();
       timerRef.current = setInterval(() => {
+        alert(`セット時間${Math.floor((Date.now() - startTime) / 1000)}`)
         setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
       }, 1000);
-      
-      alert(`セット時間${elapsedTime % 60}`)
+
       if (navigator.geolocation) {
         const watchId = navigator.geolocation.watchPosition(
           (pos) => {
