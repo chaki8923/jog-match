@@ -96,7 +96,7 @@ const TrackerMap = () => {
       timerRef.current = setInterval(() => {
         setElapsedTime(() => {
           const newTime = Math.floor((Date.now() - startTime) / 1000);
-          alert(`セット時間: ${newTime}`); // newTimeを使用
+          // alert(`セット時間: ${newTime}`); // newTimeを使用
           return newTime;
         });
       }, 1000);
