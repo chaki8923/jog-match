@@ -160,8 +160,8 @@ const TrackerMap = () => {
         </div>
         <Image
       src="/jog_match.webp"
-      width={500}
-      height={500}
+      width={100}
+      height={5}
       alt="Picture of the author"
     />
       </div>
