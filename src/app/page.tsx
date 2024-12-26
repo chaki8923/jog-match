@@ -1,8 +1,12 @@
-'use client';
+import TopSwiper from "./component/swiper/swiper";
+import AuthButton from "@/app/component/AuthButton.server";
 
-import dynamic from 'next/dynamic';
+export default async function Home() {
 
-// TrackerMap コンポーネントを遅延ロードし、SSR を無効化
-const TrackerMap = dynamic(() => import('./tracking/TrackerMapComponent'), { ssr: false });
 
-export default TrackerMap;
+    return (
+        <>
+        <TopSwiper  />
+        </>
+    )
+} 

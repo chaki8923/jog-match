@@ -1,0 +1,65 @@
+.slideWrapper {
+    max-width: 100%;
+  }
+  
+  .slideImage {
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    height: 100%;
+  }
+
+  .relative{
+    position: relative;
+  }
+
+  .slideMessage{
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    font-size: 32px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    text-align: center;
+    color: #fefefe;
+  }
+
+  .scrollDown {
+    position: absolute;
+    right: 0;
+    bottom: 24px;
+    left: 0;
+    margin: auto;
+    z-index: 10;
+    width :34px;
+    height: 55px;
+  }
+  .mousey {
+    width: 3px;
+    padding: 10px 15px;
+    height: 35px;
+    border: 2px solid #fff;
+    border-radius: 25px;
+    opacity: 0.75;
+    box-sizing: content-box;
+  }
+  .scroller {
+    width: 3px;
+    height: 10px;
+    border-radius: 25%;
+    background-color: #fff;
+    animation-name: scroll;
+    animation-duration: 2.2s;
+    animation-timing-function: cubic-bezier(.15,.41,.69,.94);
+    animation-iteration-count: infinite;
+  }
+  @keyframes scroll {
+    0% { opacity: 0; }
+    10% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(15px); opacity: 0;}
+  }
+  
+  @media screen and (min-width: 768px) {
+    .slideImage {
+      aspect-ratio: initial;
+    }
+  }
+  
