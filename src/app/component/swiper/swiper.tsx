@@ -2,8 +2,10 @@
 import React from 'react';
 // Import Swiper React components
 import { Autoplay, Navigation, Pagination, EffectFade } from "swiper/modules";
+import { useSession } from "next-auth/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
+
 
 // Import Swiper styles
 import 'swiper/css';
@@ -20,7 +22,10 @@ const images = [
 
 
 export default function TopSwiper() {
- 
+
+  const session = useSession();
+  console.log("クライアントセッション", session);
+  
   return (
     <>
       <Swiper
