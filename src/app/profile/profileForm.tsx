@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { UpdateUserSchema, UpdateUserSchemaType } from '@/schemas/UpdateUser';
+import { Session } from "@auth/core/types";
 import CropImg from "./cropper";
 import { useForm, FormProvider } from 'react-hook-form';
 import FadeModal from '@/app/component/modal/fadeModal';
@@ -11,14 +12,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Head from "next/head";
 import styles from "./index.module.scss"
 
-
-export default function Form({ session }: { session: any }) {
+export default function Form({ session }: { session: Session }) {
   const [isSubmit, setIsSubmit] = useState(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const methods = useForm<UpdateUserSchemaType>({
-    mode: 'onChange',
+    mode: 'onBlur',
     resolver: zodResolver(UpdateUserSchema)
   });
 
@@ -40,14 +40,14 @@ export default function Form({ session }: { session: any }) {
     setIsSuccess(false);
   };
 
-
+  const email = session ? session.user!.email : "";
   const onSubmit = async (params: FormData) => {
     setIsSubmit(true);
     const data = {
       name: params.name,
       postal_code: params.postal_code,
       image: childCropData,
-      email: session.user.email,
+      email: email,
       state: params.state,
       line1: params.line1
     };
@@ -76,6 +76,7 @@ export default function Form({ session }: { session: any }) {
     setValue,
     formState: { errors, isValid, isSubmitting },
   } = methods
+  
 
   return (
     <>

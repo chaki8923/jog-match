@@ -1,26 +1,21 @@
 'use client'
-import { 
-  UseFormRegister, 
-  FieldErrors, 
-  UseFormSetValue, 
-  FieldValues 
-} from 'react-hook-form';
-
+import { UseFormRegister, FieldErrors, UseFormSetValue } from 'react-hook-form';
+import { UpdateUserSchemaType } from '@/schemas/UpdateUser';
 import { useState } from "react";
 import axios from 'axios';
 import styles from "./index.module.scss"
 
 
 // Props の型定義
-type formProps<TFieldValues extends FieldValues = FieldValues> = {
-  register: UseFormRegister<TFieldValues>;
-  errors: FieldErrors<TFieldValues>;
-  setValue: UseFormSetValue<TFieldValues>;
+type formProps = {
+  register: UseFormRegister<UpdateUserSchemaType>;
+  errors: FieldErrors<UpdateUserSchemaType>;
+  setValue: UseFormSetValue<UpdateUserSchemaType>;
 };
 
 export default function Address(props: formProps) {
   const [zipcode, setZipcode] = useState('');   // 郵便番号
-
+  console.log("error", props.errors);
   const getAddress = async (): Promise<void> => {
     const res = await axios.get("https://zipcloud.ibsnet.co.jp/api/search", {
       params: { zipcode: zipcode },
@@ -51,7 +46,7 @@ export default function Address(props: formProps) {
               />
               <span className={styles.autoInputBtn} onClick={getAddress}>住所自動入力</span>
               {props.errors.postal_code && (
-                <span className="self-start text-xs text-red-500">{props.errors.root?.message}</span>
+                <span className="self-start text-xs text-red-500">{props.errors.postal_code.message}</span>
               )}
             </div>
             <div className={styles.formContent}>
@@ -62,7 +57,7 @@ export default function Address(props: formProps) {
 
               />
               {props.errors.state && (
-                <span className="self-start text-xs text-red-500">{props.errors.root?.message}</span>
+                <span className="self-start text-xs text-red-500">{props.errors.state.message}</span>
               )}
             </div>
             <div className={styles.formContent}>
@@ -73,7 +68,7 @@ export default function Address(props: formProps) {
 
               />
               {props.errors.line1 && (
-                <span className="self-start text-xs text-red-500">{props.errors.root?.message}</span>
+                <span className="self-start text-xs text-red-500">{props.errors.line1.message}</span>
               )}
             </div>
           </div>

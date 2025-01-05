@@ -14,10 +14,11 @@ const Modal: React.FC<{ isOpen: boolean; onClose: () => void; content: string }>
         onClick={(e) => e.stopPropagation()} // モーダルのクリックで閉じないようにする
       >
         <h2 className={`text-lg font-bold mb-4 ${styles.modalTitle}`}>計算結果</h2>
-        <p>あなたの{content}</p>
+        <p>あなたの<span className={styles.result}>{content}</span></p>
         <p className={styles.description}><span className={styles.underLine}>BMIは18.5以上～25未満</span>が標準範囲とされ、その範囲より大きすぎても小さすぎても病気にかかりやすくなるとされています。</p>
         <Image
           src="/tanita.webp"
+          className={styles.tanitaImage}
           width={720}
           height={100}
           alt="体脂肪率" />

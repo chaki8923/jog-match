@@ -24,13 +24,6 @@ export async function GET(request: Request) {
 }
 
 
-export async function FIND(email: string) {
-  console.log("ユニーク", email);
-  
-  const user = await prisma.user.findUnique({ where: { email } })
-  return NextResponse.json(user);
-}
-
 export async function DELETE(request: NextRequest) {
   const id = request.nextUrl.searchParams.get('id')!;
 

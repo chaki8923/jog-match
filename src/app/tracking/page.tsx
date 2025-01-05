@@ -6,11 +6,20 @@ import AuthButton from "@/app/component/AuthButton.server";
 export default async function tracker() {
     const session = await auth();
     
-    return (
-    <>
-    <AuthButton></AuthButton>
-    <TrackerMap session={session} ></TrackerMap>
-    </>
-)
+    if(!session){
+        return (
+            <>
+            <AuthButton></AuthButton>
+            <p>ログインしてください</p>
+            </>
+        )
+    }else{
+        return (
+        <>
+        <AuthButton></AuthButton>
+        <TrackerMap session={session} ></TrackerMap>
+        </>
+    )
+    }
 
 }

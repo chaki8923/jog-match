@@ -106,7 +106,7 @@ const BodyFatCalculator = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        content={`BMI: ${bmi?.toFixed(2)}, 体脂肪率: ${bodyFat?.toFixed(2)}%`}
+        content={`BMIは: ${bmi?.toFixed(2)}, 体脂肪率は: ${bodyFat?.toFixed(2)}%`}
       />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import type { Map, Marker } from 'leaflet'; // Leaflet の型をインポート
+import { Session } from "@auth/core/types";
 import axios from 'axios'
 import {User} from '@/types/user';
 import 'leaflet/dist/leaflet.css';
@@ -10,14 +11,6 @@ import styles from '../tracking/index.module.scss';
 import { BrowserRouter } from 'react-router-dom';
 import Counting from './progress/circle';
 import { ConfirmModal } from './modal/confirm';
-
-interface Session {
-  user: {
-    /** The user's Id. */
-    id: string,
-    email: string
-  }
-}
 
 export default function TrackerMap({ session }: { session: Session }) {
   const mapRef = useRef<Map | null>(null);
@@ -57,7 +50,7 @@ export default function TrackerMap({ session }: { session: Session }) {
     console.log("ユーザー取得");
     
     try {
-      const email = session.user.email
+      const email = session.user!.email
       const response = await axios.get('/api/user/', {
         params: { email: email } // クエリパラメータとして送信
       })

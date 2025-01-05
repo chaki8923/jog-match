@@ -28,7 +28,9 @@ const CropImg = (props: onDataChange) => {
   //アップロードした画像のObjectUrlをステイトに保存する
   useEffect(() => {
     if (fileData instanceof File) {
-      objectUrl && URL.revokeObjectURL(objectUrl);
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
       setObjectUrl(URL.createObjectURL(fileData));
     } else {
       setObjectUrl(undefined);
@@ -66,14 +68,14 @@ const CropImg = (props: onDataChange) => {
         crop.width,
         crop.height
       );
-      
+
       canvas.toBlob((result) => {
         if (result instanceof Blob) {
           setProfileImg(URL.createObjectURL(result));
           props.onDataChange(URL.createObjectURL(result))
         }
       });
-      
+
     }
   };
 
@@ -89,12 +91,15 @@ const CropImg = (props: onDataChange) => {
 
   return (
     <div>
-        <input
-          type="file"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            e.target.files && setFileData(e.target.files[0]);
-          }}
-        />
+      <input
+        type="file"
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            setFileData(file); // File を確実にセット
+          }
+        }}
+      />
       <div>
         {(objectUrl && !props.isSubmit) && (
           <ReactCrop
@@ -109,10 +114,12 @@ const CropImg = (props: onDataChange) => {
         )}
       </div>
       {(objectUrl && !props.isSubmit) && (
-      <span  className={`${styles.cropBtn}`} onClick={() => {makeProfileImgObjectUrl();}}>切り取り</span>
+        <span className={`${styles.cropBtn}`} onClick={() => { makeProfileImgObjectUrl(); }}>切り取り</span>
       )}
       <div>
-        {(profileImg && !props.isSubmit) ? <img className={styles.croppedImage} src={profileImg} alt="プロフィール画像" /> : ""}
+        {profileImg && !props.isSubmit ? (
+          <img className={styles.croppedImage} src={profileImg} alt="プロフィール画像" />
+        ) : null}
       </div>
     </div>
   );
