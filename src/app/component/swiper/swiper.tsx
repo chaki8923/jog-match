@@ -18,9 +18,13 @@ const images = [
   { img: "/jog3.jpg", text: "さぁ、出会いと健康を掴みにに行こう" },
 ];
 
+interface SwiperInstance {
+  slideNext: () => void;
+  // 必要な他のメソッドを追加
+}
 
 export default function TopSwiper() {
-  const swiperRef = useRef<any>(null); // Swiper インスタンスを保持
+  const swiperRef = useRef<SwiperInstance | null>(null); // Swiper インスタンスを保持
   const [activeIndex, setActiveIndex] = useState(0);
   const changeSlide = () => {
     swiperRef.current?.slideNext()

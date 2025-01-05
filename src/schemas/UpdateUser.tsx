@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const allowedExtensions = ['jpg', 'jpeg', 'png'];
+// const allowedExtensions = ['jpg', 'jpeg', 'png'];
 
 export const UpdateUserSchema = z
   .object({

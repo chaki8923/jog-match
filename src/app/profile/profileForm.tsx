@@ -12,12 +12,10 @@ import Head from "next/head";
 import styles from "./index.module.scss"
 
 
-
 export default function Form({ session }: { session: any }) {
   const [isSubmit, setIsSubmit] = useState(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState(false);
 
   const methods = useForm<UpdateUserSchemaType>({
     mode: 'onChange',
@@ -40,20 +38,18 @@ export default function Form({ session }: { session: any }) {
 
   const closeModal = () => {
     setIsSuccess(false);
-    setIsVisible(false);
   };
 
 
   const onSubmit = async (params: FormData) => {
     setIsSubmit(true);
-    let data = {
+    const data = {
       name: params.name,
       postal_code: params.postal_code,
       image: childCropData,
       email: session.user.email,
       state: params.state,
       line1: params.line1
-
     };
     reset();
     await fetch(`/api/profile/`, {
@@ -68,7 +64,7 @@ export default function Form({ session }: { session: any }) {
         setIsLoading(false);
         setIsSuccess(true);
       }
-    }).catch((err) => {
+    }).catch(() => {
       alert("メール送信エラー。もう一度お試しください")
     })
   };
@@ -78,7 +74,6 @@ export default function Form({ session }: { session: any }) {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors, isValid, isSubmitting },
   } = methods
 
@@ -90,7 +85,7 @@ export default function Form({ session }: { session: any }) {
       </Head>
       <div className={styles.form}>
         {isSuccess ?
-          <FadeModal setIsVisible={setIsVisible} closeModal={closeModal} message="プロフィールを更新しました" /> : null}
+          <FadeModal closeModal={closeModal} message="プロフィールを更新しました" /> : null}
         <div className="bg-white p-8 rounded-lg shadow-md w-96">
           <h2 className="text-2xl mb-4 text-gray-800 text-center text-bold">プロフィール変更</h2>
           <FormProvider {...methods}>

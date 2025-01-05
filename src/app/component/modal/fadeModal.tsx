@@ -6,13 +6,12 @@ import { Toast } from 'flowbite-react';
 import styles from './index.module.scss';
 
 interface FadeModalProps {
-  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
   closeModal: () => void;
   message: string;
 }
 
 
-const Component: React.FC<FadeModalProps> = ({ setIsVisible, closeModal, message }) => {
+const Component: React.FC<FadeModalProps> = ({closeModal, message }) => {
   const [isVisible, setIsVisibleLocal] = useState(false);
   useEffect(() => {
     // 親から渡された isCart の値が true の場合にローカルの isVisible も true に設定

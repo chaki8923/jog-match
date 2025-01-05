@@ -11,8 +11,15 @@ import { BrowserRouter } from 'react-router-dom';
 import Counting from './progress/circle';
 import { ConfirmModal } from './modal/confirm';
 
+interface Session {
+  user: {
+    /** The user's Id. */
+    id: string,
+    email: string
+  }
+}
 
-export default function TrackerMap({ session }: { session: any }) {
+export default function TrackerMap({ session }: { session: Session }) {
   const mapRef = useRef<Map | null>(null);
   const markerRef = useRef<Marker | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null); // タイマーを useRef で管理
