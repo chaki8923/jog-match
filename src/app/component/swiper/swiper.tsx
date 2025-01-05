@@ -1,34 +1,49 @@
 'use client'
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { signIn } from "next-auth/react";
 // Import Swiper React components
-import { Autoplay, Navigation, Pagination, EffectFade } from "swiper/modules";
-import { useSession } from "next-auth/react";
+import { Navigation, Pagination, EffectFade } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
-
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
 import styles from "./index.module.scss";
 
-
 const images = [
-  { img: "/jog1.jpg", text: "素晴らしい" },
-  { img: "/jog2.jpg", text: "健康" },
-  { img: "/jog3.jpg", text: "ジョギングマッチング" },
-  { img: "/jog3.jpg", text: "健康に出会いを" },
+  { img: "/jog1.jpg", text: "走ることで、出会いが始まる" },
+  { img: "/jog2.jpg", text: "あなたのペースや興味に合わせて最適なジョギングパートナーを見つける" },
+  { img: "/jog4.jpg", text: "ジョギングを通じて、新しい友達や仲間をつくりませんか？" },
+  { img: "/jog3.jpg", text: "さぁ、出会いと健康を掴みにに行こう" },
 ];
 
 
 export default function TopSwiper() {
+  const swiperRef = useRef<any>(null); // Swiper インスタンスを保持
+  const [activeIndex, setActiveIndex] = useState(0);
+  const changeSlide = () => {
+    swiperRef.current?.slideNext()
+  };
 
-  const session = useSession();
-  console.log("クライアントセッション", session);
-  
+
+  const handleSaveData = async () => {
+    try {
+      await signIn('google', { redirectTo: "/tracking" });
+    } catch (error) {
+      console.error("ログインエラー:", error);
+      throw error;
+    }
+  };
+
+
   return (
     <>
       <Swiper
+        onSwiper={(swiper) => (swiperRef.current = swiper)} // Swiper インスタンスを取得
+        onSlideChange={(swiper) => {
+          setActiveIndex(swiper.activeIndex); // スライド変更時にインデックスを更新
+        }}
         direction="vertical" // 縦スライド
         slidesPerView={1}
         speed={1000} // スライドが切り替わる時の速度
@@ -46,12 +61,19 @@ export default function TopSwiper() {
 
         {images.map((item, index: number) => (
           <SwiperSlide key={index} className={styles.relative}>
-            <p className={styles.slideMessage}>{item.text}</p>
+            <p className={`${styles.slideMessage} ${activeIndex == 3 ? styles.fadeIn : ''}`}>{item.text}</p>
+            {activeIndex == 3 && (
+              <button onClick={() => handleSaveData()}
+                className={styles.googleLoginBtn}>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" />
+                <span>Get started with Google</span>
+              </button>
+            )}
             <Image
               src={item.img}
               width={1920}
               height={1038}
-              alt="Slider Image"
+              alt={item.text}
               sizes="(min-width: 1024px) 100vw, 100vw"
               loading="eager"
               className={styles.slideImage}
@@ -59,11 +81,14 @@ export default function TopSwiper() {
           </SwiperSlide>
         ))}
       </Swiper>
-      <div className={styles.scrollDown}>
+      {activeIndex < 3 && (
+      <div className={`${styles.scrollDown}`}
+        onClick={() => changeSlide()}>
         <div className={styles.mousey}>
           <div className={styles.scroller}></div>
         </div>
       </div>
+      )}
     </>
   );
 }

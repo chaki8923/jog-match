@@ -6,6 +6,6 @@ export async function signIn() {
 }
 
 export async function signOut() {
-  await nextAuthSignOut({redirectTo: "/signin"});
+  await nextAuthSignOut({redirectTo: "/"});
 }
 

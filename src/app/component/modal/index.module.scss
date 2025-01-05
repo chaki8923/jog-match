@@ -1,0 +1,52 @@
+.modal{
+  position: absolute!important;
+  top: 72%!important;
+  left: 50%!important;
+  transform: translateX(-50%)!important;
+  z-index: 1200!important;
+  background-color: #fff!important;
+  width: 360px;
+  height: 200px;
+  padding: 10px 0;
+}
+
+.modalBody{
+  margin: auto;
+}
+
+.saveIcon{
+  margin: auto;
+  width: 46px;
+  height: 46px;
+  color: #6d6b6b;
+}
+
+.yesBtn{
+  background-color: #f05f5f;
+  border: #ee3636 1px solid;
+}
+
+.noBtn{
+  border: 2px #918f8f solid;
+}
+
+.container {
+  padding: 20px;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  z-index: 20;
+}
+
+.fadeOut {
+  opacity: 1;
+}
+
+.hide {
+  z-index: 20;
+  opacity: 0;
+  transition: .3s;
+  transition: opacity  .5s ease-out;
+}

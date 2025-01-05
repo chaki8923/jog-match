@@ -1,4 +1,4 @@
-FROM postgres:1４
+FROM postgres:14
 
 # Time ZoneAc
 ENV TZ Asia/Tokyo

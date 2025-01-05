@@ -2,10 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import type { Map, Marker } from 'leaflet'; // Leaflet の型をインポート
+import axios from 'axios'
+import {User} from '@/types/user';
 import 'leaflet/dist/leaflet.css';
 import Image from 'next/image'
 import styles from '../tracking/index.module.scss';
-
+import { BrowserRouter } from 'react-router-dom';
+import Counting from './progress/circle';
+import { ConfirmModal } from './modal/confirm';
 
 
 export default function TrackerMap({ session }: { session: any }) {
@@ -16,8 +20,47 @@ export default function TrackerMap({ session }: { session: any }) {
   const [lastPosition, setLastPosition] = useState<[number, number] | null>(null);
   const [distance, setDistance] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isShowModal, setIsShowModal] = useState(false);
+  const [user, setUser] = useState<User | null>(null);;
   const EARTH_RADIUS = 6371;
-  
+
+  const handleChangeConfirmed = async () => {
+    console.log("user情報", user!.email);
+    setIsShowModal(false);
+
+    try {
+      const userId = user!.id
+      const runTime = elapsedTime - 3;
+      const response = await axios.post('/api/userRecord/', {
+        userId,
+        runTime,
+        distance
+      })
+
+      // 成功時の処理
+      console.log('Record created:', response.data)
+    } catch (error) {
+      // エラー処理
+      console.error('Error creating record', error)
+    }
+  }
+
+  const findUser = async() => {
+    if(user) return;
+    console.log("ユーザー取得");
+    
+    try {
+      const email = session.user.email
+      const response = await axios.get('/api/user/', {
+        params: { email: email } // クエリパラメータとして送信
+      })
+
+      setUser(response.data)
+    } catch (error) {
+      // エラー処理
+      console.error('Error creating record', error)
+    }
+  }
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const toRad = (value: number) => (value * Math.PI) / 180;
     const dLat = toRad(lat2 - lat1);
@@ -56,7 +99,6 @@ export default function TrackerMap({ session }: { session: any }) {
             (pos) => {
               const { latitude, longitude } = pos.coords;
               const initialPosition: [number, number] = [latitude, longitude];
-              // setLastPosition(initialPosition);
 
               if (mapRef.current) mapRef.current.setView(initialPosition, 15);
               if (markerRef.current) {
@@ -82,19 +124,25 @@ export default function TrackerMap({ session }: { session: any }) {
     };
   }, []);
 
-  const handleStartStop = () => {
+  const handleStartStop = async () => {
     if (tracking) {
       setTracking(false);
+      setIsShowModal(true);
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
+
     } else {
       setTracking(true);
-      setDistance(0);
-      setElapsedTime(0);
-      setLastPosition(null);
+      setDistance(distance);
+      setElapsedTime(elapsedTime);
+      setLastPosition(lastPosition);
+      setIsShowModal(false);
 
+      findUser();
+      console.log("user", user);
+      
       const startTime = Date.now();
       timerRef.current = setInterval(() => {
         setElapsedTime(() => {
@@ -126,7 +174,7 @@ export default function TrackerMap({ session }: { session: any }) {
             if (markerRef.current) {
               markerRef.current.setLatLng(newPos);
             } else {
-              markerRef.current = L.marker(newPos).addTo(mapRef.current!);
+              // markerRef.current = L.marker(newPos).addTo(mapRef.current!);
             }
           },
           (err) => console.error('位置情報取得エラー:', err),
@@ -139,34 +187,42 @@ export default function TrackerMap({ session }: { session: any }) {
   };
 
   return (
-    <div>
-      <div className={styles.flex}>
-        <div style={{ padding: '10px' }}>
-          <p>移動距離: {distance.toFixed(2)} km</p>
-          <p>経過時間: {Math.floor(elapsedTime / 60)}分 {elapsedTime % 60}秒</p>
-          <button
-            onClick={handleStartStop}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: tracking ? 'red' : 'green',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}
-          >
-            {tracking ? '停止' : '開始'}
-          </button>
+    <>
+      <Image src={`${user ? user.image : "/defaultUser.png"}`}
+            width={50}
+            height={50}
+            alt="Picture of the author"/>
+      {tracking && (
+        <BrowserRouter>
+          <Counting tracking={tracking} />
+        </BrowserRouter>
+      )}
+      <div>
+        <div className={styles.flex}>
+          <div style={{ padding: '10px' }}>
+            <p>移動距離: {distance.toFixed(2)} km</p>
+            {elapsedTime > 3 && (
+              <p>経過時間: {Math.floor(elapsedTime / 60)}分 {(elapsedTime % 60) - 3}秒</p>
+            )}
+          </div>
+          <Image
+            src="/jog_match.webp"
+            width={100}
+            height={5}
+            alt="Picture of the author"
+          />
         </div>
-        <Image
-      src="/jog_match.webp"
-      width={100}
-      height={5}
-      alt="Picture of the author"
-    />
+        <div id="map" style={{ height: '90vh', width: '100%' }}></div>
       </div>
-      <div id="map" style={{ height: '90vh', width: '100%' }}></div>
-    </div>
+      {(!tracking || elapsedTime > 3) && (
+        <div className={`${styles.btnEngineStart} ${tracking ? styles.btnEngineOn : styles.btnEngineOff}`} onClick={handleStartStop}>
+          <button className={`${styles.btn} ${styles.btnEngineStartIn} ${tracking ? styles.EngineOn : styles.EngineOff}`}>{tracking ? 'STOP' : 'START'} <br /><span>RUNNING</span> </button>
+        </div>
+      )}
+      {isShowModal && (
+        <ConfirmModal handleChangeConfirmed={handleChangeConfirmed} />
+      )}
+    </>
   );
 };
 

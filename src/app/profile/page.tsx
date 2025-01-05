@@ -1,15 +1,15 @@
-import TrackerMap from "../component/TrackerMapComponent";
+import Form from "./profileForm";
 import {auth} from "@/auth";
 import AuthButton from "@/app/component/AuthButton.server";
 
 
-export default async function tracker() {
+export default async function profile() {
     const session = await auth();
     
     return (
     <>
     <AuthButton></AuthButton>
-    <TrackerMap session={session} ></TrackerMap>
+    <Form session={session} ></Form>
     </>
 )
 

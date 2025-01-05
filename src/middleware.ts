@@ -7,11 +7,10 @@ export default auth(async (req: NextRequest) => {
   const session = await auth();
   console.log("ミドルウェア", session);
   
-
   // 未認証のユーザーはログインページにリダイレクト
   if (!session) {
     console.log("ユーザーは未認証です。ログインページにリダイレクトします。");
-    return NextResponse.redirect(new URL("/signin", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   // 認証済みの場合はそのまま次の処理へ進む

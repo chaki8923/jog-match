@@ -45,7 +45,7 @@ model Session {
 
 model User {
   id            String    @id @default(cuid())
-  customerId    String?         @unique //stripe連携用
+  customerId    String?   
   name          String?
   email         String?   @unique
   emailVerified DateTime?
@@ -66,4 +66,11 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model UserRecord {
+  id            String    @id @default(cuid())
+  userId        String
+  runTime       Int
+  distance      Int
 }

@@ -8,7 +8,7 @@ import { prisma } from "@/prisma"
 export const BASE_PATH = "/api/auth";
  
 export const { auth, handlers, signIn, signOut } = NextAuth({
-  // adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma),
   providers: [GitHub, Google({clientId: process.env.GOOGLE_CLIENT_ID ,clientSecret: process.env.GOOGLE_CLIENT_SECRET})],
   basePath: BASE_PATH,
   secret: process.env.NEXTAUTH_SECRET,
