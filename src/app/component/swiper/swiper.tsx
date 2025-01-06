@@ -33,7 +33,7 @@ export default function TopSwiper() {
 
   const handleSaveData = async () => {
     try {
-      await signIn('google', { redirectTo: "/tracking" });
+      await signIn('google', { redirectTo: "/profile" });
     } catch (error) {
       console.error("ログインエラー:", error);
       throw error;
