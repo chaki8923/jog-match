@@ -16,10 +16,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     authorized({request, auth}){
         try{
             const {pathname }= request.nextUrl;
+            console.log(pathname);
+            
             if(pathname === "/protected-page") return !!auth;
             return true
         }catch(err){
-            console.log(err);
+            alert(err)
         }
     },
     jwt({token, trigger, session}){
