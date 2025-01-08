@@ -3,7 +3,7 @@ import {auth} from "@/auth";
 import AuthButton from "@/app/component/AuthButton.server";
 
 export default async function profile() {
-    const session = await auth();
+    const session = await auth();    
   
     if (!session) {
       return (

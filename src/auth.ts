@@ -5,7 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/prisma"
 
 // 認証APIのベースパス
-export const BASE_PATH = "https://jog-match.vercel.app/api/auth";
+export const BASE_PATH = "/api/auth";
  
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
