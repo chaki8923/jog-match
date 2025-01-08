@@ -1,25 +1,14 @@
-import { auth } from "@/auth";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+export { auth as middleware } from "@/auth";
 
-export default auth(async (req: NextRequest) => {
-  // セッション情報を取得
-  const session = await auth();
-  console.log("ミドルウェア", session);
-  console.log("ミドルウェア", req);
-  
-  // 未認証のユーザーはログインページにリダイレクト
-  // if (!session) {
-  //   console.log("ユーザーは未認証です。ログインページにリダイレクトします。");
-  //   return NextResponse.redirect(new URL("/", req.url));
-  // }
-
-  // 認証済みの場合はそのまま次の処理へ進む
-  return NextResponse.next();
-});
-
-// matcherで特定のパスにのみミドルウェアを適用
 export const config = {
-  matcher: ["/tracking"],
-  runtime: 'nodejs',
-};
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+  ],
+}
