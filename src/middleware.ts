@@ -6,6 +6,7 @@ export default auth(async (req: NextRequest) => {
   // セッション情報を取得
   const session = await auth();
   console.log("ミドルウェア", session);
+  console.log("ミドルウェア", req);
   
   // 未認証のユーザーはログインページにリダイレクト
   // if (!session) {
