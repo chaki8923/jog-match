@@ -6,7 +6,7 @@ import { prisma } from "@/prisma"
 
 // 認証APIのベースパス
 export const BASE_PATH = "/api/auth";
- 
+
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [Google({clientId: process.env.GOOGLE_CLIENT_ID ,clientSecret: process.env.GOOGLE_CLIENT_SECRET})],
